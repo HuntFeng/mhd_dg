@@ -1,0 +1,13 @@
+services:
+  kokkos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kokkos
+    container_name: mhd_dg
+    volumes:
+      - .:/workspace/mhd_dg
+      - ${HOME}/.config/nvim:/root/.config/nvim
+    working_dir: /workspace/mhd_dg
+    tty: true
+    stdin_open: true
