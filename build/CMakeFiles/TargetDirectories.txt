@@ -1,0 +1,3 @@
+/workspace/mhd_dg/build/CMakeFiles/main.dir
+/workspace/mhd_dg/build/CMakeFiles/edit_cache.dir
+/workspace/mhd_dg/build/CMakeFiles/rebuild_cache.dir

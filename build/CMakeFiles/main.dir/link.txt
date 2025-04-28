@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -DKOKKOS_DEPENDENCE -march=native -mtune=native CMakeFiles/main.dir/main.cpp.o -o main  -Wl,-rpath,/usr/local/lib -lINIReader /usr/local/lib/libhdf5.so.310.5.0 /usr/local/lib/libkokkoscontainers.a /usr/local/lib/libkokkoscore.a /usr/lib/gcc/x86_64-linux-gnu/12/libgomp.so /usr/lib/x86_64-linux-gnu/libpthread.a -ldl /usr/local/lib/libkokkossimd.a 

@@ -8,6 +8,9 @@ services:
     volumes:
       - .:/workspace/mhd_dg
       - ${HOME}/.config/nvim:/root/.config/nvim
+      - /tmp/.X11-unix:/tmp/.X11-unix # <-- Mount the X11 socket!
+    environment:
+      - DISPLAY=${DISPLAY} # <-- Pass the DISPLAY env var!
     working_dir: /workspace/mhd_dg
     tty: true
     stdin_open: true
