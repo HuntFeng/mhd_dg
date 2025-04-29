@@ -1,9 +1,6 @@
 services:
-  kokkos:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: kokkos
+  mhd_dg:
+    build: .
     container_name: mhd_dg
     volumes:
       - .:/workspace/mhd_dg

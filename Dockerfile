@@ -1,17 +1,37 @@
-# FROM ubuntu
-FROM continuumio/miniconda3:main
+FROM ubuntu
+# FROM continuumio/miniconda3:main
+
+RUN apt update && apt install -y sudo
+
+RUN <<EOF
+# add a non-root normal user appuser 
+useradd -m appuser && echo "appuser:password" | chpasswd && adduser appuser sudo
+# no password for sudo
+echo "appuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+EOF
+USER appuser
 
 # essential things
 RUN <<EOF 
-apt update
-apt install -y build-essential cmake nano git wget curl unzip
-conda install conda-forge::gdb
+sudo apt install -y build-essential cmake nano git wget curl unzip
+sudo apt install -y software-properties-common
+# install python3 and pip for python packages
+sudo apt install -y python3 python3-pip
+# remove EXTERNALLY-MANAGED so we can do pip install as normal site-packages
+sudo rm -f /usr/lib/python3*/EXTERNALLY-MANAGED
 pip install GDBKokkos
+# install gdb for debugging
+sudo apt install -y gdb 
+# xclip for system clipboard
+sudo apt install -y xclip
+# install nodejs and npm for copilot 
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && sudo apt install -y nodejs
 EOF
+
 
 WORKDIR /root
 # inih for reading .ini file
-RUN apt install -y libinih-dev
+RUN sudo apt install -y libinih-dev
 
 # hdf5 for better output format
 RUN <<EOF
@@ -85,18 +105,13 @@ ENV OMP_PLACES=threads
 
 # Neovim
 RUN <<EOF
-# install lua5.1 for luarock
-# apt install -y liblua5.1-0-dev
-# install imagemagick for image preview
-# apt install -y libmagickwand-dev
-# xclip for system clipboard
-apt install -y xclip
-# install nodejs and npm for copilot 
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt install -y nodejs
+sudo add-apt-repository -y ppa:neovim-ppa/unstable
+sudo apt update
+sudo apt install -y neovim
 # install neovim
-wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
-chmod +x nvim-linux-x86_64.appimage
-./nvim-linux-x86_64.appimage --appimage-extract
-mv squashfs-root /
-ln -s /squashfs-root/AppRun /usr/bin/nvim
+# wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+# chmod +x nvim-linux-x86_64.appimage
+# ./nvim-linux-x86_64.appimage --appimage-extract
+# mv squashfs-root /
+# ln -s /squashfs-root/AppRun /usr/bin/nvim
 EOF
