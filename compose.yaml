@@ -1,0 +1,14 @@
+services:
+  mhd_dg:
+    image: mhd_dg:amd64
+    container_name: mhd_dg
+    platform: linux/amd64
+    volumes:
+      - .:/workspace/mhd_dg
+      - ${HOME}/.config/nvim:/home/appuser/.config/nvim
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=host.docker.internal:0
+    working_dir: /workspace/mhd_dg
+    tty: true
+    stdin_open: true

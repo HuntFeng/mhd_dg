@@ -1,22 +1,25 @@
 FROM ubuntu
-# FROM continuumio/miniconda3:main
 
 RUN apt update && apt install -y sudo
 
-RUN <<EOF
 # add a non-root normal user appuser 
+# set no password for sudo
+# give permission to .config folder
+RUN <<EOF
 useradd -m appuser && echo "appuser:password" | chpasswd && adduser appuser sudo
-# no password for sudo
 echo "appuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+mkdir /home/appuser/.config
+chown appuser:appuser /home/appuser/.config
 EOF
 USER appuser
+WORKDIR /home/appuser
 
 # essential things
 RUN <<EOF 
 sudo apt install -y build-essential cmake nano git wget curl unzip
 sudo apt install -y software-properties-common
 # install python3 and pip for python packages
-sudo apt install -y python3 python3-pip
+sudo apt install -y python3 python3-pip python3-venv
 # remove EXTERNALLY-MANAGED so we can do pip install as normal site-packages
 sudo rm -f /usr/lib/python3*/EXTERNALLY-MANAGED
 pip install GDBKokkos
@@ -25,11 +28,9 @@ sudo apt install -y gdb
 # xclip for system clipboard
 sudo apt install -y xclip
 # install nodejs and npm for copilot 
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && sudo apt install -y nodejs
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash - && sudo apt install -y nodejs
 EOF
 
-
-WORKDIR /root
 # inih for reading .ini file
 RUN sudo apt install -y libinih-dev
 
@@ -44,8 +45,8 @@ cmake -B build \
 -DCMAKE_BUILD_TYPE=Release \
 -DHDF5_ENABLE_ZLIB_SUPPORT=Off \
 -DHDF5_ENABLE_SZIP_SUPPORT=Off
-cmake --build build --parallel
-cmake --install build --prefix /usr/local
+cmake --build build --parallel 4
+sudo cmake --install build --prefix /usr/local
 EOF
 
 # highfive for easier hdf5 usage
@@ -60,8 +61,8 @@ cmake -B build \
 -DHIGHFIVE_EXAMPLES=Off \
 -DHIGHFIVE_USE_BOOST=Off \
 -DHIGHFIVE_UNIT_TESTS=Off
-cmake --build build --parallel
-cmake --install build --prefix /usr/local
+cmake --build build --parallel 4
+sudo cmake --install build --prefix /usr/local
 EOF
 
 # gridformat for generating vtk files for paraview visualization
@@ -76,8 +77,8 @@ cd gridformat-${GRIDFORMAT_VERSION}
 # cd gridformat
 # git checkout cleanup/api-unavailable-writer-error
 cmake -B build
-cmake --build build --parallel
-cmake --install build --prefix /usr/local
+cmake --build build --parallel 4
+sudo cmake --install build --prefix /usr/local
 EOF
 
 
@@ -96,8 +97,8 @@ cmake -B build \
 -DKokkos_ENABLE_OPENMP=On \
 -DKokkos_ARCH_NATIVE=On \
 -DKokkos_ENABLE_DEPRECATED_CODE_4=Off
-cmake --build build --parallel
-cmake --install build --prefix /usr/local
+cmake --build build --parallel 4
+sudo cmake --install build --prefix /usr/local
 EOF
 # set these env vars to optimize OPENMP 4.0 performance
 ENV OMP_PROC_BIND=spread
@@ -105,13 +106,7 @@ ENV OMP_PLACES=threads
 
 # Neovim
 RUN <<EOF
-sudo add-apt-repository -y ppa:neovim-ppa/unstable
-sudo apt update
-sudo apt install -y neovim
-# install neovim
-# wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
-# chmod +x nvim-linux-x86_64.appimage
-# ./nvim-linux-x86_64.appimage --appimage-extract
-# mv squashfs-root /
-# ln -s /squashfs-root/AppRun /usr/bin/nvim
+wget https://github.com/neovim/neovim/releases/download/v0.11.1/nvim-linux-x86_64.tar.gz
+tar xzvf nvim-linux-x86_64.tar.gz
+sudo ln -s /home/appuser/nvim-linux-x86_64/bin/nvim /usr/bin/nvim
 EOF
