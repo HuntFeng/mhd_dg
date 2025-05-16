@@ -1,0 +1,11 @@
+1. Implement normal DG using 2D rectangular grid
+  - doing this we know the grid information we need
+2. Implement general grid system for later generalization
+  - each cell has an unique number as it index 
+  - each cell index we can find its vertices
+  - we can also find the coordinates of the vertices
+  - we can then build cell2points, face2meshp, face2cell, cell2face, face2cf
+  - not neccessarily we will use all of them, but keeping them in a class is convenient
+3. Implement DG in general grid system
+  - use the connectivity information stored in Grid class
+  
